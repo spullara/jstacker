@@ -19,4 +19,11 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
+  <dependencies>
+    <dependency>
+      <groupId>com.twitter</groupId>
+      <artifactId>util-core</artifactId>
+      <version>5.1.2</version>
+    </dependency>
+  </dependencies>
 </project>

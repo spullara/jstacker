@@ -61,10 +61,10 @@ object JstackParser extends RegexParsers {
   }
   def jstacks() = rep(jstack())
 
-  def apply(reader: Reader) {
+  def apply(reader: Reader) = {
     parseAll(jstacks(), reader) match {
-      case Success(result, _) => println(result)
-      case failure: NoSuccess => println(failure.msg)
+      case Success(result, _) => result
+      case failure: NoSuccess => throw new IllegalArgumentException(failure.msg)
     }
   }
 }

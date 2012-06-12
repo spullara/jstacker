@@ -39,7 +39,7 @@ object JstackParser extends RegexParsers {
 
   val threadName = "\"" ~> "[^\"]+".r <~ "\""
 
-  val priority: Parser[Int] = "prio=" ~> int
+  val priority = "prio=" ~> int
   
   val tid = "tid=" ~> hex
   
@@ -47,7 +47,8 @@ object JstackParser extends RegexParsers {
   
   val daemon = "(daemon)?".r ^^ { _ != "" }
   
-  val mode = "(sleeping|waiting for monitor entry|waiting on condition|runnable|in Object.wait\\(\\))".r
+  // val mode = "(sleeping|waiting for monitor entry|waiting on condition|runnable|in Object.wait\\(\\))".r
+  val mode = ( "sleeping" | "waiting for monitor entry" | "waiting on condition" | "runnable" | "in Object.wait()" )
   
   val location = "[" ~> hex <~ "]"
   
@@ -59,7 +60,7 @@ object JstackParser extends RegexParsers {
   
   val trace = method ~ source ^^ { case m ~ l => Trace(m, l) }
   
-  val concurrent = ("- " ~> "(locked|parking to wait for|waiting on)".r) ~ ("<" ~> hex) ~ ("> (a " ~> "[a-zA-Z0-9_$.]+".r) <~ ")" ^^ {
+  val concurrent = ("- " ~> ( "locked" | "parking to wait for" | "waiting on" ) ~ ("<" ~> hex) ~ ("> (a " ~> "[a-zA-Z0-9_$.]+".r) <~ ")" ^^ {
     case what ~ address ~ where => Concurrent(what, address, where)
   }
 

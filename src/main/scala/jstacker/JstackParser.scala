@@ -47,7 +47,6 @@ object JstackParser extends RegexParsers {
   
   val daemon = "(daemon)?".r ^^ { _ != "" }
   
-  // val mode = "(sleeping|waiting for monitor entry|waiting on condition|runnable|in Object.wait\\(\\))".r
   val mode = ( "sleeping" | "waiting for monitor entry" | "waiting on condition" | "runnable" | "in Object.wait()" )
   
   val location = "[" ~> hex <~ "]"

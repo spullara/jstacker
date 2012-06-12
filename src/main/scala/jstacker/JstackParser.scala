@@ -59,7 +59,7 @@ object JstackParser extends RegexParsers {
   
   val trace = method ~ source ^^ { case m ~ l => Trace(m, l) }
   
-  val concurrent = ("- " ~> ( "locked" | "parking to wait for" | "waiting on" ) ~ ("<" ~> hex) ~ ("> (a " ~> "[a-zA-Z0-9_$.]+".r) <~ ")" ^^ {
+  val concurrent = ("- " ~> ( "locked" | "parking to wait for" | "waiting on" )) ~ ("<" ~> hex) ~ ("> (a " ~> "[a-zA-Z0-9_$.]+".r) <~ ")" ^^ {
     case what ~ address ~ where => Concurrent(what, address, where)
   }
 

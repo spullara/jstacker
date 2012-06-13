@@ -27,9 +27,9 @@ case class Jstack(date: Date, version: String, stacks: List[Stack], refs: Int)
 
 object JstackParser extends RegexParsers {
 
-  val format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-
-  val date = "[0-9]+-[0-9]+-[0-9]+ [0-9]+:[0-9]+:[0-9]+".r  ^^ (format.parse)
+  def date = "[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}".r  ^^ {
+    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse
+  }
 
   val hex = "0x[0-9a-f]+".r
 
@@ -57,32 +57,32 @@ object JstackParser extends RegexParsers {
   
   val source = "(" ~> ("Native Method" | "Unknown Source" | "\\(inline\\)(:[0-9]+)?".r | "[a-zA-Z0-9_$.]+(:[0-9]+)?".r) <~ ")"
   
-  val trace = method ~ source ^^ { case m ~ l => Trace(m, l) }
+  def trace = method ~ source ^^ { case m ~ l => Trace(m, l) }
   
-  val concurrent = ("- " ~> ( "locked" | "parking to wait for" | "waiting on" )) ~ ("<" ~> hex) ~ ("> (a " ~> "[a-zA-Z0-9_$.]+".r) <~ ")" ^^ {
+  def concurrent = ("- " ~> ( "locked" | "parking to wait for" | "waiting on" )) ~ ("<" ~> hex) ~ ("> (a " ~> "[a-zA-Z0-9_$.]+".r) <~ ")" ^^ {
     case what ~ address ~ where => Concurrent(what, address, where)
   }
 
   val jni = "JNI global references: " ~> int
 
-  val thread = threadName ~ daemon ~ priority ~ tid ~ nid ~ mode ~ opt(location) ~ opt(state) ^^ {
+  def thread = threadName ~ daemon ~ priority ~ tid ~ nid ~ mode ~ opt(location) ~ opt(state) ^^ {
     case name ~ daemon ~ priority ~ tid ~ nid ~ mode ~ location ~ state => Thread(name, daemon, priority, tid, nid, mode, location, state)
   }
   
-  val lines = (trace | concurrent) ^^ {
+  def lines = (trace | concurrent) ^^ {
     case trace: Trace => Left(trace)
     case concurrent: Concurrent => Right(concurrent)
   }
   
-  val stack = thread ~ rep(lines) ^^ {
+  def stack = thread ~ rep(lines) ^^ {
     case thread ~ lines => Stack(thread, lines)
   }
   
-  val jstack = date ~ version ~ rep(stack) ~ jni ^^ {
+  def jstack = date ~ version ~ rep(stack) ~ jni ^^ {
     case date ~ version ~ stacks ~ refs => Jstack(date, version, stacks, refs)
   }
   
-  val jstacks = rep(jstack)
+  def jstacks = rep(jstack)
 
   def apply(reader: Reader) = {
     parseAll(jstacks, reader) match {

@@ -37,10 +37,9 @@ object Main {
     def sum(a: List[Stack]) = {
       a.foldLeft(Map[String, AtomicInteger]()) {
         case (map, stack) =>
-          var lines = stack.lines.filter({
+          val key = stack.lines.filter({
             _.isLeft
-          })
-          val key = lines.map({
+          }).map({
             _.left
           }).head.get.method
 
